@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Simple Test Site</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Georgia', serif;
+  color: #333;
+
+  background:
+    linear-gradient(
+      rgba(255,240,245,0.88),
+      rgba(255,228,225,0.88)
+    ),
+    url("background.jpg");
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+#lockScreen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom, #fff0f5, #ffe4e1);
+}
+
+#box {
+  background: rgba(255,255,255,0.95);
+  padding: 45px;
+  border-radius: 25px;
+  text-align: center;
+  box-shadow:
+    0 0 25px rgba(255,105,180,0.5),
+    0 0 60px rgba(255,182,193,0.4);
+  max-width: 380px;
+  animation: softPulse 4s ease-in-out infinite;
+}
+
+#box h2 {
+  color: #b22222;
+  margin-bottom: 15px;
+}
+
+#box input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: 2px solid #ff69b4;
+  text-align: center;
+  font-size: 16px;
+  outline: none;
+  transition: 0.3s;
+}
+
+#box input:focus {
+  border-color: #ff1493;
+  box-shadow: 0 0 10px rgba(255,105,180,0.4);
+}
+
+#box button {
+  margin-top: 20px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 20px;
+  background: #ff69b4;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#box button:hover {
+  background: #ff1493;
+}
+
+#content {
+  display: none;
+  padding: 50px;
+  text-align: center;
+}
+.main-title {
+  font-size: 42px;
+  color: #b22222;
+  margin-top: 40px;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: #444;
+  text-align: center;
+  max-width: 600px;
+  margin: 15px auto 0;
+  line-height: 1.6;
+}
+
+.letters-section {
+  margin-top: 60px;
+}
+
+.letters-section h2 {
+  text-align: center;
+  color: #b22222;
+  margin-bottom: 30px;
+}
+
+.letter-box {
+  background: #fff0f5;
+  border: 2px solid #ff69b4;
+  border-radius: 18px;
+  padding: 20px;
+  max-width: 700px;
+  margin: 20px auto;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.letter-box:hover {
+  background: #ffe4e1;
+}
+
+.letter-box h3 {
+  margin: 0;
+  color: #b22222;
+}
+
+.letter-content {
+  display: none;
+  margin-top: 15px;
+  line-height: 1.6;
+}
+.memories-section {
+  margin-top: 70px;
+}
+
+.memories-section h2 {
+  text-align: center;
+  color: #b22222;
+  margin-bottom: 30px;
+}
+
+.memory-box {
+  background: #fff0f5;
+  border: 2px solid #ff69b4;
+  border-radius: 18px;
+  padding: 20px;
+  max-width: 750px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.memory-box h3 {
+  margin: 0;
+  text-align: center;
+  color: #b22222;
+}
+
+.memory-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.6s ease;
+}
+
+.memory-content.open {
+  max-height: 300px; /* enough to show images */
+}
+
+.memory-content img {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.6s ease;
+} 
+
+.time-section {
+  margin-top: 50px;
+  text-align: center;
+}
+
+.time-section h2 {
+  color: #b22222;
+  margin-bottom: 15px;
+}
+
+#timeTogether {
+  font-size: 28px;
+  font-weight: bold;
+  background: rgba(255,255,255,0.7);
+  display: inline-block;
+  padding: 15px 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+#fxCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Make sure content stays above canvas */
+#content {
+  position: relative;
+  z-index: 1;
+}
+
+#lockScreen {
+  position: fixed;
+  z-index: 3;
+}
+
+@keyframes softPulse {
+  0% { box-shadow: 0 0 25px rgba(255,105,180,0.4); }
+  50% { box-shadow: 0 0 45px rgba(255,182,193,0.6); }
+  100% { box-shadow: 0 0 25px rgba(255,105,180,0.4); }
+}
+
+/* MEMORY ANIMATION */
+.memory-content {
+  overflow: hidden;
+}
+
+.memory-track {
+  display: flex;
+  gap: 20px;
+  width: max-content;
+  animation: memoryScroll 25s linear infinite;
+}
+
+.memory-track img {
+  width: 220px;
+  height: 220px;          /* forces square */
+  object-fit: cover;     /* crops like Instagram */
+  border-radius: 18px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+}
+
+
+@keyframes memoryScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* PHOTO ZOOM OVERLAY */
+#photoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45); /* lighter dim */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+#zoomedPhoto {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: zoomIn 0.4s ease;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* MEMORY PHOTO CARD */
+.memory-content img {
+  aspect-ratio: 4 / 5; /* Instagram portrait */
+  max-width: 220px;
+}
+
+/* ZOOM EFFECT */
+.memory-content img.zoomed {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 80vw;
+  max-width: 420px;
+  height: auto;
+  transform: translate(-50%, -50%) scale(1);
+  z-index: 9999;
+  transition: all 0.6s ease;
+}
+
+/* SIMPLE PHOTO ZOOM OVERLAY */
+#photoOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#photoZoomBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#photoZoomBox img {
+  width: 80vw;
+  max-width: 420px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  animation: zoomIn 0.4s ease;
+}
+
+#photoZoomBox p {
+  margin-top: 15px;
+  font-size: 18px;
+  color: white;
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.memories-section {
+  position: relative;
+  z-index: 5;
+}
+
+#surpriseMessage {
+  display: none;
+  margin: 30px auto;
+  max-width: 600px;
+  background: #fff0f5;
+  border: 2px dashed #ff69b4;
+  border-radius: 18px;
+  padding: 25px;
+  font-size: 18px;
+  color: #b22222;
+  line-height: 1.6;
+  box-shadow: 0 10px 25px rgba(255,105,180,0.3);
+  animation: fadeInSurprise 0.8s ease;
+}
+
+@keyframes fadeInSurprise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#countdownScreen {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom, #fff0f5, #ffe4e1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.countdown-box {
+  background: rgba(255,255,255,0.95);
+  padding: 40px;
+  border-radius: 25px;
+  text-align: center;
+  max-width: 420px;
+  box-shadow:
+    0 0 30px rgba(255,105,180,0.4),
+    0 0 60px rgba(255,182,193,0.3);
+}
+
+.countdown-box h2 {
+  color: #b22222;
+  margin-bottom: 20px;
+}
+
+#countdownTimer {
+  font-size: 26px;
+  font-weight: bold;
+  color: #b22222;
+}
+
+</style>
+</head>
+
+<body> 
+
+<!-- COUNTDOWN SCREEN -->
+<div id="countdownScreen">
+  <div class="countdown-box">
+    <h2>⏳ Wait until 01-01-2026, my darling 🤍</h2>
+    <div id="countdownTimer">Loading…</div>
+  </div>
+</div>
+
+<div id="lockScreen">
+  <div id="box">
+   <h2>💖 Before You Enter 💖</h2>
+<p>
+  There is one memory only you know.<br>
+  Answer it, my love.
+</p>
+
+<p style="margin-top:15px;font-weight:bold;">
+  When did we meet in real life for the first time?
+</p>
+
+<input id="answer" placeholder="A memory only we share💗">
+<br><br>
+<button onclick="unlockSite()">Unlock ❤️</button>
+<p id="error" style="color:red;"></p>
+
+  </div>
+</div>
+
+<div id="content">
+
+ <h1 class="main-title" onclick="showSurprise()">A Year With You ❤️</h1>
+
+  <p class="subtitle">
+    My Lord’s blessing — written across distance and time.
+  </p>
+<!-- TIME TOGETHER -->
+<div class="time-section">
+  <h2>⏳ Our Time Together</h2>
+  <div id="timeTogether">Loading...</div>
+</div>
+
+<div id="surpriseMessage">
+  <p>
+    HEEEEYYYY MYYY LOOVVEEEE !!!!!!<br><br>
+   Did you like this surprise babygirl? I will surely give you plenty of 1000s of surprises as we go forward togther in our life. Dont worry darling, you are in the right hands. I will take care of you like no on else in this world would.
+  </p>
+</div>
+
+  <!-- LETTERS SECTION -->
+  <div class="letters-section">
+
+    <h2>💌 Letters for My Wife 💌</h2>
+
+    <div class="letter-box" onclick="openLetter(0)">
+      <h3>Our First Year Together</h3>
+      <div class="letter-content">
+        <p>
+          To my beloved, beautiful, loving and caring wife,It has been one year since we have started our journey together. Looking back I am thankful to my Lord and grateful to him for making you come into my life. He knew i needed someone really wonderful and amazing to take care of me, love me and to be with me. You are not just my loving wife... You are a daughter to my parents, You are a second mother figure to zelda, You are my closest friend that i can share anything with, You are my kids mother, You are someone i would always be proud and happy for. I CANT WAIT TO TALK ALL THE TIME ABOUT YOU WHEN SOMEONE ASKS ME "HOW IS YOUR WIFE DOING ROSHAN?". I thought I was happy alone, I thought I did not needed anyone... until you came into my life and shown me you are all I need. You have made my life brighter, colourful and more enjoying. I started to enjoy calling you nivus and now i cant stop calling you nivus. I am happy that i could be your husband cause you are SOOO MUCHH WORTH THANN ANYTHING IN THIS WORLD. I am so happy that I am able to share my whole life with a pretty lady like you my darling. You are all I dreamed of, you are all I ever wanted. I am smiling right now even while I am writing this letter thinking about you will be smiling reading this, I will keep making you smile forever, I will keep making you laugh louder and louder forever and ever cause, your seeign you happy is what makes me happy nivuse. I want to meet your parents when its the right time and say how proud they should be about you my love. I am so happy they made you into this amazing lady I am with right now. I am also so happy we are growing into a couple, a son and a daughter for both of our parents. I hope when you go through this webiste, it will make you happier and more happier. Last but not least, HAPPY FIRST YEAR FOR US BABY !!!! SO PROUD AND HAPPY THAT WE HAVE REACHED ONE YEAR OF OUR LOVE 🤍🤍🤍
+        </p>
+      </div>
+    </div>
+
+    <div class="letter-box" onclick="openLetter(1)">
+      <h3>I Wish…</h3>
+      <div class="letter-content">
+        <p>
+         I wish i could hug you so tight and kiss you until i can make your lips red. I wish i could hold you so tight and say slowly to you ears "Happy first year to us baby". I wish i could see you eyes looking at me when i hug you so tight wrapped in my arms. I wish i could see you right now and celebrate our special day together. I wish we could marry fast so that we would never let go of each other. I wish i could make your wishes come true. I love youuuu and I promise to love you till my last breath miss wonderful.
+        </p>
+      </div>
+    </div>
+<div class="letter-box" onclick="openLetter(2)">
+  <h3>I Promise You…🤍</h3>
+  <div class="letter-content">
+    <p>
+      that I will choose you every single day.<br><br>
+      I promise to hold your hand when life is easy,
+      and hold you tighter when it is not. I will grow with you not apart from you.<br><br>
+      I promise to listen, to understand,
+      and to never let you feel alone. I will try to understand your silence, not just your words.<br><br>
+      I promise you my love, my patience,
+      my loyalty, and my forever. I promise to take you all your bad days and give you much better beautiful days. i promise to always ne with you, close to you and to never leave you for anything. 
+    </p>
+  </div>
+</div>
+
+  </div> 
+
+<!-- MEMORIES SECTION -->
+<div class="memories-section">
+
+  <h2>📸 Our Memories 📸</h2>
+
+  <div class="memory-box" onclick="toggleMemories()">
+    <h3>Open Our Memories</h3>
+
+ <div id="memoryContent" class="memory-content">
+  <div class="memory-track">
+
+    <img src="photo1.jpg" data-caption="The very first time we met🤍" onclick="zoomPhoto(this)">
+    <img src="photo2.jpg" data-caption="My wife on my shoulders🥰" onclick="zoomPhoto(this)">
+    <img src="photo3.jpg" data-caption="Us being us😂" onclick="zoomPhoto(this)">
+    <img src="photo4.jpg" data-caption="We cant stay far away from each other😉" onclick="zoomPhoto(this)">
+    <img src="photo5.jpg" data-caption="We being a couple on honeymoon😭" onclick="zoomPhoto(this)">
+    <img src="photo6.jpg" data-caption="Our happiness is all that matters📸" onclick="zoomPhoto(this)">
+    <img src="photo7.jpg" data-caption="Us being a totally normal couple🤣" onclick="zoomPhoto(this)">
+
+
+    <!-- duplicate once for smooth loop -->
+    <img src="photo1.jpg" data-caption="The very first time we met🤍" onclick="zoomPhoto(this)">
+    <img src="photo2.jpg" data-caption="My wife on my shoulders🥰" onclick="zoomPhoto(this)">
+    <img src="photo3.jpg" data-caption="Us being us😂" onclick="zoomPhoto(this)">
+    <img src="photo4.jpg" data-caption="We cant stay far away from each other😉" onclick="zoomPhoto(this)">
+    <img src="photo5.jpg" data-caption="We being a couple on honeymoon😭" onclick="zoomPhoto(this)">
+    <img src="photo6.jpg" data-caption="Our happiness is all that matters📸" onclick="zoomPhoto(this)">
+    <img src="photo7.jpg" data-caption="Us being a totally normal couple🤣" onclick="zoomPhoto(this)">
+
+
+  </div>
+</div>
+
+<audio id="bgMusic" src="song.mp3" loop></audio>
+<canvas id="fxCanvas"></canvas>
+
+<script>
+const targetDate = new Date("2026-01-01T00:00:00");
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = targetDate - now;
+
+  if (diff <= 0) {
+    // Time reached — unlock site
+    document.getElementById("countdownScreen").style.display = "none";
+    document.getElementById("lockScreen").style.display = "flex";
+    return;
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
+
+  document.getElementById("countdownTimer").innerHTML =
+    `${days} days · ${hours} hours · ${minutes} minutes · ${seconds} seconds`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+function unlockSite() {
+  const input = document.getElementById("answer").value.toLowerCase().trim();
+
+  if (input.includes("may") && input.includes("17")) {
+    document.getElementById("lockScreen").style.display = "none";
+    document.getElementById("content").style.display = "block";
+    startMusic();
+  } else {
+    document.getElementById("error").innerText = "Almost… try again darling💗";
+  }
+}
+function startMusic() {
+  const music = document.getElementById("bgMusic");
+
+  music.volume = 0;
+
+  const playPromise = music.play();
+
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      // Mobile blocked autoplay — wait for user tap
+      document.addEventListener("click", playOnInteraction, { once: true });
+      document.addEventListener("touchstart", playOnInteraction, { once: true });
+    });
+  }
+
+  function playOnInteraction() {
+    music.play();
+    fadeInMusic(music);
+  }
+
+  fadeInMusic(music);
+}
+
+function fadeInMusic(music) {
+  let v = 0;
+  const fade = setInterval(() => {
+    if (v < 0.3) {
+      v += 0.01;
+      music.volume = v;
+    } else {
+      clearInterval(fade);
+    }
+  }, 100);
+}
+
+function openLetter(index) {
+  const letters = document.querySelectorAll(".letter-content");
+
+  letters.forEach((letter, i) => {
+    if (i === index) {
+      letter.style.display =
+        letter.style.display === "block" ? "none" : "block";
+    } else {
+      letter.style.display = "none";
+    }
+  });
+}
+function toggleMemories() {
+  const memories = document.getElementById("memoryContent");
+  memories.classList.toggle("open");
+}
+const startDate = new Date("2025-01-01T00:00:00");
+
+function updateTimeTogether() {
+  const now = new Date();
+  let diff = Math.floor((now - startDate) / 1000);
+
+  const years = Math.floor(diff / (365 * 24 * 3600));
+  diff %= (365 * 24 * 3600);
+
+  const days = Math.floor(diff / (24 * 3600));
+  diff %= (24 * 3600);
+
+  const hours = Math.floor(diff / 3600);
+  diff %= 3600;
+
+  const minutes = Math.floor(diff / 60);
+  const seconds = diff % 60;
+
+  document.getElementById("timeTogether").innerHTML =
+    `${years} years · ${days} days · ${hours} hours · ${minutes} minutes · ${seconds} seconds`;
+}
+
+setInterval(updateTimeTogether, 1000);
+updateTimeTogether();
+const canvas = document.getElementById("fxCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+
+// Load images
+const heartImg = new Image();
+const petalImg = new Image();
+heartImg.src = "heart.png";
+petalImg.src = "petal.png";
+
+let imagesLoaded = 0;
+
+function startFXWhenReady() {
+  imagesLoaded++;
+  if (imagesLoaded === 2) {
+    animateFX();
+  }
+}
+
+heartImg.onload = startFXWhenReady;
+petalImg.onload = startFXWhenReady;
+
+const particles = [];
+
+class Particle {
+  constructor(img) {
+    this.img = img;
+    this.reset();
+  }
+
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * -canvas.height;
+    this.size = Math.random() * 18 + 10;
+    this.speed = Math.random() * 0.3 + 0.2; // slow & romantic
+    this.angle = Math.random() * Math.PI * 2;
+    this.spin = Math.random() * 0.01 - 0.005;
+  }
+
+  update() {
+    this.y += this.speed;
+    this.angle += this.spin;
+
+    if (this.y > canvas.height) {
+      this.reset();
+    }
+  }
+
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    ctx.drawImage(this.img, -this.size / 2, -this.size / 2, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+// Create particles
+for (let i = 0; i < 20; i++) particles.push(new Particle(petalImg));
+for (let i = 0; i < 15; i++) particles.push(new Particle(heartImg));
+
+function animateFX() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateFX);
+}
+
+/* PHOTO ZOOM + CAPTION (NO FLIP) */
+function zoomPhoto(img) {
+  const overlay = document.getElementById("photoOverlay");
+  const zoomed = document.getElementById("zoomedPhoto");
+  const caption = document.getElementById("photoCaption");
+
+  zoomed.src = img.src;
+  caption.innerText = img.dataset.caption || "";
+
+  overlay.style.display = "flex";
+}
+
+function closePhoto(e) {
+  if (e.target.id === "photoOverlay") {
+    document.getElementById("photoOverlay").style.display = "none";
+  }
+}
+function showSurprise() {
+  const msg = document.getElementById("surpriseMessage");
+
+  msg.style.display =
+    msg.style.display === "block" ? "none" : "block";
+}
+
+</script>
+
+<!-- SIMPLE PHOTO ZOOM OVERLAY -->
+<div id="photoOverlay" onclick="closePhoto(event)">
+  <div id="photoZoomBox">
+    <img id="zoomedPhoto">
+    <p id="photoCaption"></p>
+  </div>
+</div>
+
+</body>
+</html>
